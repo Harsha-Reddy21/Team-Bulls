@@ -3,7 +3,7 @@ import numpy as np
 import faiss
 import pickle
 
-from add_index import index_5,index_10,index_15,index_20,index_25, index_50,index_100,embeddings_5,embeddings_10,embeddings_15,embeddings_20,embeddings_25,embeddings_50,embeddings_100
+from add_index import index_5,index_10,index_15,index_20,embeddings_5,embeddings_10,embeddings_15,embeddings_20
 from get_vector_embeddings import vector_embedding
 total_length=len(embeddings_10)
 
@@ -11,7 +11,7 @@ total_length=len(embeddings_10)
 
 
 
-def get_indices_data(df_5,df_10,df_15,df_20,df_25,df_50,df_100):
+def get_indices_data(df_5,df_10,df_15,df_20):
     final_result_data={}
 
     query_vector_5=vector_embedding(df_5,5)
@@ -52,13 +52,7 @@ def get_indices_data(df_5,df_10,df_15,df_20,df_25,df_50,df_100):
 
     
 
-    query_vector_25=vector_embedding(df_25,25)
-    distances_25, indices_25= index_25.search(np.array([query_vector_25]), total_length)
-    normalized_distances_25 = (distances_25 - np.min(distances_25)) / (np.max(distances_25) - np.min(distances_25))
-    normalized_distances_25=normalized_distances_25[0].tolist()
-    indices_25=indices_25[0].tolist()
-    for i in range(len(indices_25)):
-        final_result_data[indices_25[i]]+=(1-normalized_distances_25[i])*1.5
+   
 
     # query_vector_50=vector_embedding(df_50,50)
     # distances_50, indices_50= index_50.search(np.array([query_vector_50]), total_length)
@@ -70,19 +64,13 @@ def get_indices_data(df_5,df_10,df_15,df_20,df_25,df_50,df_100):
 
 
     
-    query_vector_100=vector_embedding(df_100,100)
-    distances_100, indices_100= index_100.search(np.array([query_vector_100]), total_length)
-    normalized_distances_100 = (distances_100 - np.min(distances_100)) / (np.max(distances_100) - np.min(distances_100))
-    normalized_distances_100=normalized_distances_100[0].tolist()
-    indices_100=indices_100[0].tolist()
-    for i in range(len(indices_100)):
-        final_result_data[indices_100[i]]+=1-normalized_distances_100[i]
+
 
 
     
 
     final_indices = sorted(final_result_data, key=lambda x: final_result_data[x],reverse=True)
-    final_indices=final_indices[:500]
+    final_indices=final_indices[:500]   
     sorted_dict = {key: final_result_data[key] for key in final_indices}
     final_data_2=sorted_dict
 

@@ -89,11 +89,9 @@ def get_data(df):
     df_10 = df[:10][::-1]
     df_15 = df[:15][::-1]
     df_20 = df[:20][::-1]
-    df_25 = df[:25][::-1]
-    df_50 = df[:50][::-1]
-    df_100 = df[:100][::-1]
 
-    indices, distances = get_indices_data(df_5, df_10, df_15, df_20, df_25, df_50, df_100)
+
+    indices, distances = get_indices_data(df_5, df_10, df_15, df_20)
     return indices, distances
 
 
