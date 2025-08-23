@@ -112,6 +112,9 @@ def get_indices():
     images=get_initial_images(indices[:30])
     return {"images":images}
 
+@app.get("/health")
+def health():
+    return {"message": "Healthy"}
 
 
 if __name__=='__main__':
