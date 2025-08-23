@@ -1,7 +1,7 @@
 # Set the directory where your images are stored
 import os
 from PIL import Image
-from main import get_indices as main_get_indices
+from main import get_indices_data as main_get_indices
 import pandas as pd
 
 images_directory = 'images'  # Change this to your image folder path

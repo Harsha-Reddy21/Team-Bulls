@@ -11,7 +11,7 @@ total_length=len(embeddings_10)
 
 
 
-def get_indices(df_5,df_10,df_15,df_20,df_25,df_50,df_100):
+def get_indices_data(df_5,df_10,df_15,df_20,df_25,df_50,df_100):
     final_result_data={}
 
     query_vector_5=vector_embedding(df_5,5)

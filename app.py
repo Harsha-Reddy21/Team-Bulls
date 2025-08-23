@@ -1,5 +1,4 @@
-
-from main import get_indices
+from main import get_indices_data
 import os
 import pandas as pd
 # df=pd.read_csv(f'images/nifty_data.csv')
@@ -78,6 +77,7 @@ def get_initial_images(images):
 
     
     print(sorted_percentages)
+    return sorted_percentages
 
 
 
@@ -93,9 +93,27 @@ def get_data(df):
     df_50 = df[:50][::-1]
     df_100 = df[:100][::-1]
 
-    indices, distances = get_indices(df_5, df_10, df_15, df_20, df_25, df_50, df_100)
-    return distances, indices
+    indices, distances = get_indices_data(df_5, df_10, df_15, df_20, df_25, df_50, df_100)
+    return indices, distances
 
 
-dist,indice=get_data(df)
-get_initial_images(indice[:30])
+from fastapi import FastAPI
+app=FastAPI()
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
+
+
+@app.get("/get_indices")
+def get_indices():
+    df=pd.read_csv(f'images/nifty_data.csv')
+    indices,distances=get_data(df)
+    print(indices)
+    images=get_initial_images(indices[:30])
+    return {"images":images}
+
+
+
+if __name__=='__main__':
+    import uvicorn
+    uvicorn.run("app:app", host="127.0.0.1", port=8000)
