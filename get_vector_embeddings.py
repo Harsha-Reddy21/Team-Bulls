@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 
 def vector_embedding(df, length):
+    # Guard against empty/None DataFrames early to avoid downstream errors
+    if df is None or df.empty:
+        raise ValueError("vector_embedding received an empty DataFrame")
     # Map of possible column names to standardized names
     column_maps = {
         'open': ['open', 'Open', 'into'],
@@ -13,9 +16,16 @@ def vector_embedding(df, length):
     
     # Function to get the first available column from possibilities
     def get_column(df, possibilities):
-        for col in possibilities:
-            if col in df.columns:
-                return df[col].values
+        # Exact match first
+        for candidate in possibilities:
+            if candidate in df.columns:
+                return df[candidate].values
+        # Case-insensitive fallback
+        lower_to_original = {c.lower(): c for c in df.columns}
+        for candidate in possibilities:
+            cand_lower = candidate.lower()
+            if cand_lower in lower_to_original:
+                return df[lower_to_original[cand_lower]].values
         raise KeyError(f"None of the columns {possibilities} found in DataFrame")
     
     # Convert data to numpy arrays using flexible column names
@@ -54,7 +64,11 @@ def vector_embedding(df, length):
         
     except Exception as e:
         print(f"Error in vector_embedding: {e}")
-        print(f"Available columns: {df.columns.tolist()}")
-        print(f"First row: {df.iloc[0]}")
+        try:
+            print(f"Available columns: {df.columns.tolist()}")
+            if len(df) > 0:
+                print(f"First row: {df.iloc[0].to_dict()}")
+        except Exception:
+            pass
         raise
    

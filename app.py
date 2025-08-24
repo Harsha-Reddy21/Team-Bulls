@@ -113,7 +113,7 @@ def get_indices(stock_token):
     indices,distances=get_data(df)
     print(indices[:10])
     images=get_initial_images(indices[:30])
-    return {"Signals":images,'Main_Singal':images["Fully Bullish. Initiate the position"]}
+    return images["Fully Bullish. Initiate the position"]
 
 @app.get("/health")
 def health():
@@ -140,63 +140,95 @@ class SymbolsRequest(BaseModel):
     symbols: List[str]
 
 
-stock_list=[ 'CTE', 'GODHA','MANORG',
-    'NUVOCO',
-    'SARVESHWAR',
-    'CPPLUS', 'EBGNG',
-    'SBGLP',
-    'TEMBO', 'GRMOVER',
-    'HOVS',
-    'MORARJEE','OSIAHYPER',
-    'PVP','SHANTIGOLD',
-    'SOUTHBANK',
-    'GMRAIRPORT',
-    'GOPAL',
-    'JHS',
-    'VEDL',
-    'FOSECOIND',
-    'GATECH',
-    'GATECHDVR',
-    'GMRP&UI',
-    'INCREDIBLE',
-    'KINGFA',
-    'RMDRIP',
-    'STEELCITY',
-    'VIRINCHI',
-    'RKEC',
-    'AAVAS',
-    'APLAPOLLO',
-    'BRITANNIA',
-    'CGCL',
-    'COALINDIA',
-    'GSLSU',
-    'IIFLCAPS',
-    'INDUSINDBK',
+stock_list=[ 'CTE', 'GODHA','MANORG','NUVOCO','SARVESHWAR','CPPLUS', 'EBGNG','SBGLP','TEMBO', 'GRMOVER','HOVS','MORARJEE','OSIAHYPER',
+    'PVP','SHANTIGOLD','SOUTHBANK','GMRAIRPORT','GOPAL','JHS','VEDL','FOSECOIND',
+    'GATECH','GATECHDVR','GMRP&UI','INCREDIBLE','KINGFA','RMDRIP','STEELCITY','VIRINCHI',
+    'RKEC','AAVAS','APLAPOLLO','BRITANNIA','CGCL','COALINDIA',
+    'GSLSU','IIFLCAPS','INDUSINDBK',
     'JAGRAN','LICI','MASTEK',
-    'NTPC','RAILTEL','RCOM','RELINFRA',
-    'RPOWER',
-    'UNITDSPR',
+    'NTPC','RAILTEL','RCOM','RELINFRA','RPOWER','UNITDSPR',
 ]
+total_stock_list={
+    'nifty':'22',
+    'TATA CONSUMER PRODUCT':'3432',
+    'HERO MOTO':'1348',
+    'UPL': '11287',
+    'BRITANNIA':'547',
+    'MARUTI SUZUKI':'10999',
+    'INDUSIND BANK':'5258',
+    'ADANI PORTS':'15083',
+    'DIVIS LAB':'10940',
+    'BAJAJ AUTO':'16669',
+    'ULTRATECH CEMENT':'11532',
+    'LT':'11483',
+    'COALINDIA':'20374',
+    'TITAN':'3506',
+    'ITC':'1660',
+    'WIPRO':'3787',
+    'NESTLE':'17963',
+    'HINDUSTAN UNILEVER':'1394',
+    'RELIANCE':'2885',
+    'TCS':'11536',
+    'ASIANPAINTS':'236',
+    'SHREE CEMENTS':'3103',
+    'BPCL':'526',
+    'JSW STEEL':'11723',
+    'BHARTI AIRTEL':'6435',
+    'TATA MOTORS':'3456',
+    'GRASIM':'1232',
+    'IOC':'1624',
+    'EICHER MOTORS':'910',
+    'POWER GRID':'14977',
+    'TATA STEEL':'3499',
+    'HINDALO':'1363',
+    'TECHM':'13538',
+    'BAJAJ FINANCE':'25270',
+    'NTPC':'11630',
+    'HDFC BANK':'1333',
+    'SUN PHARMA':'3351',
+    'SBIN':'3045',
+    'ONGC':'2475',
+    'AXIS BANK':'5900',
+    'M_M':'2031',
+    'KOTAK BANK':'1922',
+    'ICICI BANK':'4963',
+    'HCL TECH':'7229',
+    'DR REDDY':'881',
+    'INFY':'1594',
+    'SBILIFE':'21808',
+    'CIPLA':'694'
+
+
+}
+
+
+
 
 main_stock_list=['RELIIANCE','NIFTY','BANKNIFTY']
 @app.get("/filter_stocks")
 def filter_stock():
     total_symbols=[]
     for symbol in stock_list:
-        if symbol in main_stock_list:
+        if symbol in total_stock_list.keys():
             total_symbols.append(symbol)
-    return {"received_symbols": 'RELIANCE'}
+    return {"received_symbols": total_symbols}
 
 import json
 with open('total_stock_tokens.JSON', 'r') as f:
     total_stock_tokens = json.load(f)
 
+from shoonya_login import execute_stock_order
+
 @app.post("/execute_stock")
 def execute_stock(total_stocks:List[str]):
+    total_stocks=["BRITANNIA","COALINDIA","NTPC"]
     for stock in total_stocks:
-        stock_token=total_stock_tokens[stock]
-        signals,bullish_value=get_indices(stock_token)
-        print(bullish_value)
+        stock_token=total_stock_list[stock]
+        bullish_value=get_indices(stock_token)
+        print('stock',stock)
+        print('bullish_value',bullish_value)
+        if bullish_value>35:
+            execute_stock_order(api,stock_token)
         
 
 

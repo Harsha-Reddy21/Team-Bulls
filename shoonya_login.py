@@ -262,11 +262,12 @@ def execute_stock_order(api,stock_token):
 
     ret = api.get_quotes(exchange='NSE', token=stock_token)
     price=float(ret['lp'])
+    tradingsymbol=ret['tsym']
     print(price)
     total_amount=10000
     quantity=int(total_amount//price)
     ret = api.place_order(buy_or_sell='B', product_type='M',
-                        exchange='NSE', tradingsymbol=stock_token, 
+                        exchange='NSE', tradingsymbol=tradingsymbol, 
                         quantity=quantity, discloseqty=0,price_type='LMT', price=price, trigger_price=0,
                         retention='DAY', remarks='my_order_001')
 
@@ -275,4 +276,4 @@ def execute_stock_order(api,stock_token):
 
 if __name__ == '__main__':
     api = shoonya_login()
-    print(execute_stock(api,'11287'))
+    print(execute_stock_order(api,'11287'))
