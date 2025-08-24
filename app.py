@@ -1,5 +1,6 @@
 from main import get_indices_data
 import os
+from typing import List
 import pandas as pd
 from data.announcements import get_announcements
 from data.earnings import get_earnings_data
@@ -8,8 +9,7 @@ from data.money_control import get_moneycontrol_stocks_in_news
 from collections import defaultdict
 from shoonya_login import shoonya_login,get_stock_results
 api=shoonya_login()
-print(api)
-results=get_stock_results(api,'11287')
+
 # from firstock_login import get_results,get_stock_results
 # results=get_results()
 # print(results)
@@ -98,7 +98,7 @@ def get_data(df):
     return indices, distances
 
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 app=FastAPI()
 @app.get("/")
 def read_root():
@@ -106,12 +106,12 @@ def read_root():
 
 
 @app.get("/get_indices")
-def get_indices(stock_token:str):
+def get_indices(stock_token):
     results=get_stock_results(api,stock_token)
     df=pd.DataFrame(results)
     df.to_csv('images/nifty_data.csv',index=False)
     indices,distances=get_data(df)
-    print(indices)
+    print(indices[:10])
     images=get_initial_images(indices[:30])
     return {"Signals":images,'Main_Singal':images["Fully Bullish. Initiate the position"]}
 
@@ -135,6 +135,73 @@ def get_money_control():
     money_control=get_moneycontrol_stocks_in_news()
     return {"money_control":money_control}
 
+from pydantic import BaseModel
+class SymbolsRequest(BaseModel):
+    symbols: List[str]
+
+
+stock_list=[ 'CTE', 'GODHA','MANORG',
+    'NUVOCO',
+    'SARVESHWAR',
+    'CPPLUS', 'EBGNG',
+    'SBGLP',
+    'TEMBO', 'GRMOVER',
+    'HOVS',
+    'MORARJEE','OSIAHYPER',
+    'PVP','SHANTIGOLD',
+    'SOUTHBANK',
+    'GMRAIRPORT',
+    'GOPAL',
+    'JHS',
+    'VEDL',
+    'FOSECOIND',
+    'GATECH',
+    'GATECHDVR',
+    'GMRP&UI',
+    'INCREDIBLE',
+    'KINGFA',
+    'RMDRIP',
+    'STEELCITY',
+    'VIRINCHI',
+    'RKEC',
+    'AAVAS',
+    'APLAPOLLO',
+    'BRITANNIA',
+    'CGCL',
+    'COALINDIA',
+    'GSLSU',
+    'IIFLCAPS',
+    'INDUSINDBK',
+    'JAGRAN','LICI','MASTEK',
+    'NTPC','RAILTEL','RCOM','RELINFRA',
+    'RPOWER',
+    'UNITDSPR',
+]
+
+main_stock_list=['RELIIANCE','NIFTY','BANKNIFTY']
+@app.get("/filter_stocks")
+def filter_stock():
+    total_symbols=[]
+    for symbol in stock_list:
+        if symbol in main_stock_list:
+            total_symbols.append(symbol)
+    return {"received_symbols": 'RELIANCE'}
+
+import json
+with open('total_stock_tokens.JSON', 'r') as f:
+    total_stock_tokens = json.load(f)
+
+@app.post("/execute_stock")
+def execute_stock(total_stocks:List[str]):
+    for stock in total_stocks:
+        stock_token=total_stock_tokens[stock]
+        signals,bullish_value=get_indices(stock_token)
+        print(bullish_value)
+        
+
+
+
+#  http://host.docker.internal:8000/get_indices
 if __name__=='__main__':
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000)

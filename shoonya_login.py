@@ -258,9 +258,21 @@ def get_mtm(api):
             day_m2m = mtm + pnl
     return day_m2m
 
+def execute_stock_order(api,stock_token):
+
+    ret = api.get_quotes(exchange='NSE', token=stock_token)
+    price=float(ret['lp'])
+    print(price)
+    total_amount=10000
+    quantity=int(total_amount//price)
+    ret = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NSE', tradingsymbol=stock_token, 
+                        quantity=quantity, discloseqty=0,price_type='LMT', price=price, trigger_price=0,
+                        retention='DAY', remarks='my_order_001')
+
+
 
 
 if __name__ == '__main__':
     api = shoonya_login()
-    print(api)
-    print(get_stock_results(api,'11287'))
+    print(execute_stock(api,'11287'))
