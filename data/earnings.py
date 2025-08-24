@@ -1,7 +1,8 @@
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
-def get_earnings_data():
+
+def get_earnings_data(days: int = 7):
     # 1. Headers
     headers = {
         "User-Agent": (
@@ -19,24 +20,20 @@ def get_earnings_data():
 
     # 3. Date range
     to_date = datetime.today()
-    from_date = to_date - timedelta(days=7)
+    from_date = to_date - timedelta(days=days)
     from_str = from_date.strftime("%d-%m-%Y")
     to_str = to_date.strftime("%d-%m-%Y")
 
-    # 4. API URL (correct one)
-    api_url = f"https://www.nseindia.com/companies-listing/corporate-filings-event-calendar"
+    # 4. API URL (JSON endpoint)
+    api_url = f"https://www.nseindia.com/api/event-calendar?from_date={from_str}&to_date={to_str}"
 
     # 5. Get response
     response = session.get(api_url, headers=headers)
 
-
-
-
-    print(response.text)
     if response.status_code == 200 and "json" in response.headers.get("Content-Type", ""):
         data = response.json()
-        print(data)
 
+        # Convert to DataFrame
         if isinstance(data, dict):
             df = pd.DataFrame(data.get("data", []))
         elif isinstance(data, list):
@@ -44,11 +41,14 @@ def get_earnings_data():
         else:
             df = pd.DataFrame()
 
-        if not df.empty and "symbol" in df.columns:
-            symbols = sorted(df['symbol'].dropna().unique().tolist())
+        result = df['symbol'].unique().tolist()
+        return result
 
-    return symbols
+    else:
+        print("❌ Failed to fetch JSON. Got:", response.status_code, response.headers.get("Content-Type"))
+        return pd.DataFrame()
+    
 
 if __name__ == "__main__":
-    print(get_earnings_data())
-
+    result = get_earnings_data(7)
+    print(result)

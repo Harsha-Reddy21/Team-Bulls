@@ -2,6 +2,8 @@ from main import get_indices_data
 import os
 import pandas as pd
 from data.announcements import get_announcements
+from data.earnings import get_earnings_data
+from data.money_control import get_moneycontrol_stocks_in_news
 # df=pd.read_csv(f'images/nifty_data.csv')
 from collections import defaultdict
 from shoonya_login import shoonya_login,get_stock_results
@@ -123,6 +125,15 @@ def get_nse_announcements():
     announcements=get_announcements()
     return {"announcements":announcements}
 
+@app.get("/get_earnings")
+def get_earnings():
+    earnings=get_earnings_data()
+    return {"earnings":earnings}
+
+@app.get("/money_control")
+def get_money_control():
+    money_control=get_moneycontrol_stocks_in_news()
+    return {"money_control":money_control}
 
 if __name__=='__main__':
     import uvicorn
