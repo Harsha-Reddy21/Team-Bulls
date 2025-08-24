@@ -1,17 +1,18 @@
 from main import get_indices_data
 import os
 import pandas as pd
+from data.announcements import get_announcements
 # df=pd.read_csv(f'images/nifty_data.csv')
 from collections import defaultdict
-# from shoonya_login import shoonya_login,get_stock_results
-# api=shoonya_login()
-# print(api)
-# results=get_stock_results(api,'11287')
+from shoonya_login import shoonya_login,get_stock_results
+api=shoonya_login()
+print(api)
+results=get_stock_results(api,'11287')
 # from firstock_login import get_results,get_stock_results
 # results=get_results()
 # print(results)
 # df=pd.DataFrame(results)
-df=pd.read_csv(f'images/nifty_data.csv')
+# df=pd.to_csv('images/nifty_data.csv',index=False)
 # df.to_csv('current_data.csv',index=False)
     # Build a DataFrame from API results (list or dict) instead of treating it as a CSV path
     
@@ -103,16 +104,24 @@ def read_root():
 
 
 @app.get("/get_indices")
-def get_indices():
-    df=pd.read_csv(f'images/nifty_data.csv')
+def get_indices(stock_token:str):
+    results=get_stock_results(api,stock_token)
+    df=pd.DataFrame(results)
+    df.to_csv('images/nifty_data.csv',index=False)
     indices,distances=get_data(df)
     print(indices)
     images=get_initial_images(indices[:30])
-    return {"images":images}
+    return {"Signals":images,'Main_Singal':images["Fully Bullish. Initiate the position"]}
 
 @app.get("/health")
 def health():
     return {"message": "Healthy"}
+
+
+@app.get("/get_announcements")
+def get_nse_announcements():
+    announcements=get_announcements()
+    return {"announcements":announcements}
 
 
 if __name__=='__main__':

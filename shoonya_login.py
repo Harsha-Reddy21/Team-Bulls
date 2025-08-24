@@ -257,3 +257,10 @@ def get_mtm(api):
             pnl += float(i['rpnl'])
             day_m2m = mtm + pnl
     return day_m2m
+
+
+
+if __name__ == '__main__':
+    api = shoonya_login()
+    print(api)
+    print(get_stock_results(api,'11287'))
